@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0d0f">
+    <title>Alonso cumple 3 años</title>
+    <meta name="description" content="¡Alonso cumple 3 años! Sábado 19 de diciembre de 2026, 3:30 pm · Los Papiros Terraza, León, Gto.">
+    <meta property="og:title" content="Alonso cumple 3 años 🏎️">
+    <meta property="og:description" content="Sábado 19 de diciembre de 2026 · 3:30 pm · Los Papiros Terraza">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&family=Titillium+Web:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           3 AÑOS DE ALONSO — temática Fórmula 1
+           Colores pedidos por la mamá: blanco, negro y rojo.
+           El rojo es el de las escuderías clásicas (#e10600).
+           ============================================================ */
+        :root {
+            --rojo:        #e10600;
+            --rojo-hondo:  #9b0400;
+            --negro:       #0d0d0f;
+            --asfalto:     #1c1c20;
+            --asfalto-2:   #27272c;
+            --blanco:      #ffffff;
+            --hueso:       #f4f4f6;
+            --gris:        #a0a0aa;
+            --linea:       #33333b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: var(--negro);
+            color: var(--hueso);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        img { max-width: 100%; display: block; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        .racing { font-family: 'Racing Sans One', cursive; font-weight: 400; }
+
+        /* ── Bandera a cuadros, reutilizable ────────────────── */
+        .cuadros {
+            height: 18px;
+            background-image:
+                repeating-conic-gradient(#fff 0% 25%, #0d0d0f 0% 50%);
+            background-size: 18px 18px;
+        }
+        .cuadros.delgada { height: 12px; background-size: 12px 12px; }
+
+        /* ── Título de sección ──────────────────────────────── */
+        .section-title {
+            font-family: 'Racing Sans One', cursive;
+            font-size: clamp(1.9rem, 6vw, 3rem);
+            text-align: center;
+            color: var(--blanco);
+            letter-spacing: .02em;
+            text-transform: uppercase;
+        }
+        .section-title em {
+            font-style: normal; color: var(--rojo);
+        }
+        .subtitulo-seccion {
+            text-align: center; color: var(--gris);
+            font-size: .82rem; letter-spacing: .28em;
+            text-transform: uppercase; margin-top: .4rem;
+        }
+        .franja-roja {
+            width: 72px; height: 4px; background: var(--rojo);
+            margin: 1.1rem auto 2.4rem; border-radius: 2px;
+        }
+
+        /* ── SPLASH: luces de arranque ──────────────────────── */
+        .splash {
+            position: fixed; inset: 0; z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+            background:
+                radial-gradient(ellipse at 50% 30%, #23232a 0%, var(--negro) 70%);
+            transition: opacity .7s ease, visibility .7s ease;
+            text-align: center; padding: 2rem 1.2rem;
+        }
+        .splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .splash-inner { position: relative; z-index: 2; width: 100%; max-width: 520px; }
+
+        .semaforo {
+            display: flex; justify-content: center; gap: clamp(8px, 3vw, 18px);
+            margin-bottom: 2rem;
+        }
+        .luz {
+            width: clamp(34px, 11vw, 54px); height: clamp(34px, 11vw, 54px);
+            border-radius: 50%;
+            background: #2a2a31;
+            border: 3px solid #17171c;
+            box-shadow: inset 0 3px 8px rgba(0,0,0,.7);
+            transition: background .18s ease, box-shadow .18s ease;
+        }
+        .luz.on {
+            background: var(--rojo);
+            box-shadow: 0 0 26px 4px rgba(225,6,0,.65), inset 0 2px 6px rgba(0,0,0,.35);
+        }
+
+        .splash-eyebrow {
+            font-size: .74rem; letter-spacing: .38em; text-transform: uppercase;
+            color: var(--gris);
+        }
+        .splash-nombre {
+            font-family: 'Racing Sans One', cursive;
+            font-size: clamp(3rem, 16vw, 5.5rem);
+            color: var(--blanco); line-height: 1; margin: .4rem 0 .2rem;
+            text-transform: uppercase;
+        }
+        .splash-edad {
+            font-size: clamp(1rem, 3.5vw, 1.25rem); font-weight: 700;
+            color: var(--rojo); letter-spacing: .22em; text-transform: uppercase;
+        }
+        .splash-fecha {
+            margin-top: 1rem; color: var(--gris);
+            font-size: .9rem; letter-spacing: .16em;
+        }
+        #splashGuest { font-family: 'Racing Sans One', cursive; font-size: 1.7rem; color: var(--blanco); margin: .4rem 0; }
+        #splashPases { color: var(--gris); font-size: .9rem; margin-bottom: .6rem; }
+
+        .btn-arrancar {
+            margin-top: 2.2rem;
+            background: var(--rojo); color: #fff;
+            border: none; border-radius: 6px;
+            padding: 1rem 2.6rem;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 1rem; font-weight: 900;
+            letter-spacing: .16em; text-transform: uppercase;
+            cursor: pointer;
+            transition: transform .15s ease, background .2s ease;
+        }
+        .btn-arrancar:hover { background: #ff1a14; transform: translateY(-2px); }
+        .btn-arrancar:active { transform: translateY(0); }
+        .btn-arrancar:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+        .splash-hint { margin-top: .9rem; font-size: .72rem; color: #6a6a74; letter-spacing: .1em; }
+
+        /* ── HERO ───────────────────────────────────────────── */
+        .hero {
+            position: relative; min-height: 100svh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 3.5rem 1.2rem;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(13,13,15,0) 55%, var(--negro) 100%),
+                radial-gradient(ellipse at 50% 35%, #2a2a32 0%, var(--negro) 72%);
+        }
+        /* Asfalto con las líneas de la pista */
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0; opacity: .5;
+            background-image:
+                repeating-linear-gradient(90deg, transparent 0 78px, rgba(255,255,255,.045) 78px 80px);
+        }
+        .hero-foto {
+            position: absolute; inset: 0; display: none;
+            background-position: center 28%; background-size: cover; background-repeat: no-repeat;
+        }
+        .hero.con-foto .hero-foto { display: block; }
+        .hero.con-foto::before { opacity: .18; }
+        .hero-foto::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(13,13,15,.62) 0%, rgba(13,13,15,.38) 42%, var(--negro) 100%);
+        }
+        .hero-inner { position: relative; z-index: 2; }
+
+        /* Dorsal del piloto */
+        .dorsal {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: clamp(96px, 26vw, 140px); height: clamp(96px, 26vw, 140px);
+            border: 4px solid var(--rojo); border-radius: 12px;
+            font-family: 'Racing Sans One', cursive;
+            font-size: clamp(3.6rem, 15vw, 5.4rem);
+            color: var(--blanco); line-height: 1;
+            transform: skewX(-8deg);
+            box-shadow: 0 0 40px rgba(225,6,0,.28);
+            margin-bottom: 1.4rem;
+        }
+        .dorsal span { transform: skewX(8deg); margin-top: .35rem; }
+
+        .hero-eyebrow {
+            font-size: .74rem; letter-spacing: .4em; text-transform: uppercase;
+            color: var(--gris); margin-bottom: .5rem;
+        }
+        .hero-nombre {
+            font-family: 'Racing Sans One', cursive;
+            font-size: clamp(3.4rem, 17vw, 7rem);
+            color: var(--blanco); line-height: .95; text-transform: uppercase;
+            text-shadow: 0 6px 34px rgba(0,0,0,.6);
+        }
+        .hero-edad {
+            display: inline-block; margin-top: 1rem;
+            background: var(--rojo); color: #fff;
+            font-weight: 900; font-size: clamp(.85rem, 3vw, 1rem);
+            letter-spacing: .2em; text-transform: uppercase;
+            padding: .5rem 1.4rem; border-radius: 4px;
+            transform: skewX(-8deg);
+        }
+        .hero-edad span { display: inline-block; transform: skewX(8deg); }
+        .hero-fecha {
+            margin-top: 1.6rem;
+            font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 900;
+            letter-spacing: .06em; color: var(--blanco);
+        }
+        .hero-lugar { color: var(--gris); font-size: .95rem; margin-top: .3rem; }
+        .hero-cuadros {
+            position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+        }
+        .hero-scroll {
+            position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%);
+            z-index: 3; color: var(--gris); font-size: 1.5rem;
+            animation: flotar 2.4s ease-in-out infinite;
+        }
+        @keyframes flotar { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,8px)} }
+
+        /* ── Navegación ─────────────────────────────────────── */
+        .nav-sticky {
+            position: sticky; top: 0; z-index: 400;
+            background: rgba(13,13,15,.94);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--rojo);
+            display: flex; gap: 6px; overflow-x: auto;
+            padding: 10px 14px; scrollbar-width: none;
+        }
+        .nav-sticky::-webkit-scrollbar { display: none; }
+        .nav-sticky a {
+            flex: 0 0 auto; color: var(--hueso); text-decoration: none;
+            font-size: .76rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase;
+            padding: 7px 15px; border-radius: 4px;
+            border: 1px solid var(--linea); background: var(--asfalto);
+            transition: all .2s;
+        }
+        .nav-sticky a:hover { background: var(--rojo); border-color: var(--rojo); color: #fff; }
+
+        /* ── Cuenta regresiva: cronómetro ───────────────────── */
+        .countdown {
+            background: var(--asfalto); padding: 3.2rem 1.2rem; text-align: center;
+            border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
+        }
+        .cd-grid { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 1.6rem; }
+        .cd-box {
+            min-width: 82px; padding: 14px 10px;
+            background: var(--negro);
+            border: 1px solid var(--linea);
+            border-top: 3px solid var(--rojo);
+            border-radius: 4px;
+        }
+        .cd-num {
+            display: block; font-size: clamp(1.9rem, 7vw, 2.8rem);
+            font-weight: 900; line-height: 1; color: var(--blanco);
+            font-variant-numeric: tabular-nums;
+        }
+        .cd-lbl { font-size: .64rem; color: var(--gris); text-transform: uppercase; letter-spacing: .16em; }
+
+        /* ── Secciones ──────────────────────────────────────── */
+        .seccion { padding: 4rem 0; }
+        .seccion.oscura { background: var(--asfalto); }
+
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.2rem; }
+        .card {
+            background: var(--asfalto-2);
+            border: 1px solid var(--linea);
+            border-left: 4px solid var(--rojo);
+            border-radius: 6px; padding: 1.8rem 1.5rem;
+        }
+        .card h3 {
+            font-size: .74rem; font-weight: 700; letter-spacing: .2em;
+            text-transform: uppercase; color: var(--rojo); margin-bottom: .8rem;
+        }
+        .card .dato-grande {
+            font-size: 1.5rem; font-weight: 900; color: var(--blanco);
+            display: block; margin-bottom: .35rem;
+        }
+        .card p { color: var(--gris); font-size: .93rem; }
+        .card .mapa {
+            display: inline-block; margin-top: 1rem;
+            color: var(--blanco); font-weight: 700; font-size: .8rem;
+            letter-spacing: .1em; text-transform: uppercase;
+            text-decoration: none; border-bottom: 2px solid var(--rojo);
+            padding-bottom: 2px;
+        }
+        .card .mapa:hover { color: var(--rojo); }
+
+        /* ── El detalle de "boches" ─────────────────────────── */
+        .boches {
+            max-width: 640px; margin: 0 auto; text-align: center;
+            background: var(--asfalto-2);
+            border: 1px dashed var(--linea);
+            border-radius: 8px; padding: 2.4rem 1.8rem;
+        }
+        .boches .palabra {
+            font-family: 'Racing Sans One', cursive;
+            font-size: clamp(2.4rem, 11vw, 4rem);
+            color: var(--rojo); line-height: 1; text-transform: uppercase;
+            display: block; margin: .6rem 0 .8rem;
+        }
+        .boches p { color: var(--gris); font-size: 1rem; }
+        .boches strong { color: var(--blanco); }
+
+        /* ── Acciones ───────────────────────────────────────── */
+        .acciones { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 2.4rem; }
+        .btn-accion {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--asfalto-2); color: var(--blanco);
+            border: 1px solid var(--linea);
+            padding: 12px 24px; border-radius: 4px;
+            font-family: inherit; font-size: .8rem; font-weight: 700;
+            letter-spacing: .12em; text-transform: uppercase;
+            text-decoration: none; cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-accion:hover { background: var(--rojo); border-color: var(--rojo); transform: translateY(-2px); }
+        .btn-accion:focus-visible { outline: 3px solid var(--rojo); outline-offset: 3px; }
+
+        /* ── Galería (aparece si hay fotos) ─────────────────── */
+        .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .galeria figure {
+            margin: 0; border-radius: 6px; overflow: hidden;
+            aspect-ratio: 1 / 1; cursor: pointer;
+            background: var(--asfalto-2); border: 1px solid var(--linea);
+        }
+        .galeria img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+        .galeria figure:hover img { transform: scale(1.07); }
+        .galeria figure:focus-visible { outline: 3px solid var(--rojo); outline-offset: 2px; }
+
+        .lb { position: fixed; inset: 0; z-index: 9400; background: rgba(5,5,7,.96);
+              display: none; align-items: center; justify-content: center; padding: 20px; }
+        .lb.abierto { display: flex; }
+        .lb img { max-width: 100%; max-height: 88vh; border-radius: 6px; }
+        .lb button {
+            position: absolute; background: rgba(255,255,255,.12); color: #fff;
+            border: none; width: 46px; height: 46px; border-radius: 50%;
+            font-size: 1.4rem; cursor: pointer;
+        }
+        #lbCerrar { top: 18px; right: 18px; }
+        #lbPrev { left: 14px; top: 50%; transform: translateY(-50%); }
+        #lbNext { right: 14px; top: 50%; transform: translateY(-50%); }
+
+        /* ── RSVP ───────────────────────────────────────────── */
+        #rsvp { padding: 4.2rem 1.2rem; background: var(--negro); }
+        .rsvp-form {
+            max-width: 500px; margin: 0 auto;
+            background: var(--asfalto-2);
+            border: 1px solid var(--linea);
+            border-top: 4px solid var(--rojo);
+            border-radius: 6px; padding: 2rem;
+        }
+        .form-group { margin-bottom: 1.1rem; }
+        .form-group label {
+            display: block; margin-bottom: .4rem;
+            font-size: .72rem; font-weight: 700; letter-spacing: .14em;
+            text-transform: uppercase; color: var(--gris);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 14px;
+            border: 1px solid var(--linea); border-radius: 4px;
+            background: var(--negro); color: var(--hueso);
+            font-size: 1rem; font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--rojo);
+        }
+        .form-group textarea { min-height: 78px; resize: vertical; }
+        .btn-enviar {
+            background: var(--rojo); color: #fff; border: none;
+            padding: 14px 38px; border-radius: 4px;
+            font-family: inherit; font-size: .88rem; font-weight: 900;
+            letter-spacing: .16em; text-transform: uppercase; cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+        .btn-enviar:hover { background: #ff1a14; transform: translateY(-2px); }
+        #successMessage {
+            display: none; text-align: center; padding: 22px;
+            background: rgba(225,6,0,.12); border: 1px solid var(--rojo);
+            border-radius: 6px; margin-top: 16px; color: var(--blanco);
+        }
+
+        /* ── Pie ────────────────────────────────────────────── */
+        .footer { background: var(--negro); text-align: center; padding: 2.4rem 1.2rem; color: var(--gris); }
+        .footer p { margin: .35rem 0; font-size: .86rem; }
+        .footer a { color: var(--blanco); text-decoration: none; border-bottom: 1px solid var(--rojo); }
+
+        /* ── Aparición progresiva ───────────────────────────── */
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .hero-scroll { animation: none; }
+            .luz { transition: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═════════ SPLASH: luces de arranque ═════════
+         Se muestra SIEMPRE: el toque del botón es el gesto que
+         el navegador exige para poder arrancar la música.
+         Como en la F1, las luces se apagan y ahí empieza todo. -->
+    <div class="splash" id="splash">
+        <div class="splash-inner">
+            <div class="semaforo" id="semaforo" aria-hidden="true">
+                <div class="luz"></div><div class="luz"></div><div class="luz"></div>
+                <div class="luz"></div><div class="luz"></div>
+            </div>
+            <p class="splash-eyebrow" id="splashSubtitle">Estás invitado a la carrera</p>
+            <h1 class="splash-nombre">Alonso</h1>
+            <p class="splash-edad">Cumple 3 años</p>
+            <p id="splashGuest" style="display:none;"></p>
+            <p id="splashPases" style="display:none;"></p>
+            <p class="splash-fecha" id="splashDate">Sábado 19 de diciembre, 2026</p>
+            <button class="btn-arrancar" id="btnArrancar">Arrancar motores</button>
+            <p class="splash-hint">Toca para empezar</p>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop preload="metadata">
+        <source src="audio/cancion-alonso.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ═════════ HERO ═════════ -->
+    <section class="hero" id="inicio">
+        <div class="hero-foto" id="heroFoto"></div>
+        <div class="hero-inner">
+            <div class="dorsal"><span>3</span></div>
+            <p class="hero-eyebrow">Mis tres años</p>
+            <h1 class="hero-nombre">Alonso</h1>
+            <p class="hero-edad"><span>🏎️ ¡Vamos a correr!</span></p>
+            <p class="hero-fecha">19 · 12 · 2026</p>
+            <p class="hero-lugar">Los Papiros Terraza · León, Gto.</p>
+        </div>
+        <div class="hero-scroll">⌄</div>
+        <div class="cuadros hero-cuadros"></div>
+    </section>
+
+    <nav class="nav-sticky">
+        <a href="#cuenta">Salida en</a>
+        <a href="#circuito">El circuito</a>
+        <a href="#boches">Boches</a>
+        <a href="#galeria" id="navGaleria" hidden>Galería</a>
+        <a href="#rsvp">Confirmar</a>
+    </nav>
+
+    <!-- ═════════ CUENTA REGRESIVA ═════════ -->
+    <section class="countdown" id="cuenta">
+        <h2 class="section-title">Salida en</h2>
+        <p class="subtitulo-seccion">Faltan para la bandera verde</p>
+        <div class="cd-grid">
+            <div class="cd-box"><span class="cd-num" id="cd-days">--</span><span class="cd-lbl">Días</span></div>
+            <div class="cd-box"><span class="cd-num" id="cd-hours">--</span><span class="cd-lbl">Horas</span></div>
+            <div class="cd-box"><span class="cd-num" id="cd-minutes">--</span><span class="cd-lbl">Min</span></div>
+            <div class="cd-box"><span class="cd-num" id="cd-seconds">--</span><span class="cd-lbl">Seg</span></div>
+        </div>
+    </section>
+
+    <!-- ═════════ EL CIRCUITO ═════════ -->
+    <section class="seccion" id="circuito">
+        <div class="container reveal">
+            <h2 class="section-title">El <em>circuito</em></h2>
+            <p class="subtitulo-seccion">Dónde y cuándo</p>
+            <div class="franja-roja"></div>
+
+            <div class="cards">
+                <div class="card">
+                    <h3>🏁 Hora de salida</h3>
+                    <span class="dato-grande" data-campo="recepcion-hora">3:30 pm</span>
+                    <p>Sábado 19 de diciembre de 2026</p>
+                </div>
+
+                <div class="card">
+                    <h3>📍 El circuito</h3>
+                    <span class="dato-grande" data-campo="recepcion-lugar">Los Papiros Terraza</span>
+                    <p data-campo="recepcion-direccion">C. Thomas Alva Edison 321, El Peluchán, 37119 León, Gto.</p>
+                    <a class="mapa" data-campo="recepcion-maps" target="_blank" rel="noopener"
+                       href="https://www.google.com/maps/search/?api=1&query=Los%20Papiros%20Terraza%20Thomas%20Alva%20Edison%20321%20El%20Peluch%C3%A1n%20Le%C3%B3n%20Guanajuato">Ver en mapa →</a>
+                </div>
+
+                <div class="card" data-opcional id="cardVestimenta" hidden>
+                    <h3>👕 Uniforme de escudería</h3>
+                    <p><strong data-campo="vestimenta-tipo"></strong></p>
+                    <p style="margin-top:.4rem;" data-campo="vestimenta-colores"></p>
+                </div>
+            </div>
+
+            <div class="acciones">
+                <button class="btn-accion" id="btnCalendario">🗓️ Agendar</button>
+                <button class="btn-accion" id="btnCompartir">🔗 Compartir</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="cuadros delgada"></div>
+
+    <!-- ═════════ BOCHES ═════════ -->
+    <section class="seccion oscura" id="boches">
+        <div class="container reveal">
+            <div class="boches">
+                <p>A Alonso le encantan los coches. Aunque él todavía les dice…</p>
+                <span class="palabra">¡Boches!</span>
+                <p>Así que ponte tu casco y vente a correr con nosotros.<br>
+                   <strong>Tres años, tres vueltas, una fiesta.</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═════════ GALERÍA (aparece si hay fotos) ═════════ -->
+    <section class="seccion" id="galeria" hidden>
+        <div class="container reveal">
+            <h2 class="section-title">El <em>piloto</em></h2>
+            <p class="subtitulo-seccion">Alonso</p>
+            <div class="franja-roja"></div>
+            <div class="galeria" id="galeriaGrid"></div>
+        </div>
+    </section>
+
+    <!-- ═════════ RSVP ═════════ -->
+    <section id="rsvp">
+        <h2 class="section-title">Tu lugar en la <em>parrilla</em></h2>
+        <p class="subtitulo-seccion">Confirma tu asistencia</p>
+        <div class="franja-roja"></div>
+        <p style="text-align:center;margin-bottom:2rem;color:var(--gris);">
+            Por favor confirma antes del <span id="confirmacionLimite">12 de diciembre de 2026</span>
+        </p>
+        <div id="personalizedWelcome" style="display:none;text-align:center;margin:0 auto 24px;padding:18px;background:var(--asfalto-2);border:1px solid var(--linea);border-radius:6px;max-width:500px;">
+            <p id="guestWelcomeText" style="font-size:1.05rem;color:var(--blanco);margin-bottom:6px;"></p>
+            <p id="guestPassesText" style="color:var(--gris);font-size:.9rem;"></p>
+        </div>
+        <div class="rsvp-form">
+            <form id="rsvpForm">
+                <div class="form-group">
+                    <label for="name">Nombre completo *</label>
+                    <input type="text" id="name" name="name" required placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="guests">Cuántos vienen (incluyéndote) *</label>
+                    <input type="number" id="guests" name="guests" min="1" max="20" value="1" required>
+                </div>
+                <div class="form-group" id="nombresGroup" style="display:none;">
+                    <label>Nombres de tus acompañantes</label>
+                    <div id="nombresContainer"></div>
+                </div>
+                <div class="form-group">
+                    <label for="attendance">¿Te vemos en la pista? *</label>
+                    <select id="attendance" name="attendance" required>
+                        <option value="">Selecciona...</option>
+                        <option value="si">Sí, ahí estaré</option>
+                        <option value="no">No podré asistir</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensaje para Alonso (opcional)</label>
+                    <textarea id="message" name="message" placeholder="Déjale un mensaje..."></textarea>
+                </div>
+                <div style="text-align:center;">
+                    <button type="submit" class="btn-enviar">Confirmar</button>
+                </div>
+            </form>
+            <div id="successMessage">🏁 ¡Listo! Tu lugar en la parrilla está confirmado.</div>
+        </div>
+    </section>
+
+    <div class="cuadros"></div>
+
+    <!-- ═════════ PIE ═════════ -->
+    <footer class="footer">
+        <p style="color:var(--blanco);font-weight:700;letter-spacing:.14em;text-transform:uppercase;">Producciones Foro 7</p>
+        <p>Fotografía, Video e Invitaciones Web</p>
+        <p>📱 <a href="https://wa.me/524779203776" target="_blank" rel="noopener">WhatsApp 477 920 3776</a></p>
+        <p style="margin-top:.9rem;font-size:.78rem;opacity:.6;">Invitación digital creada con ♥ por Foro 7</p>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Foto a pantalla completa">
+        <button id="lbCerrar" aria-label="Cerrar">&times;</button>
+        <button id="lbPrev" aria-label="Anterior">&#10094;</button>
+        <button id="lbNext" aria-label="Siguiente">&#10095;</button>
+        <img id="lbImg" src="" alt="">
+    </div>
+
+    <button id="musicToggle" aria-label="Activar o silenciar la música"
+            style="position:fixed;bottom:20px;right:20px;z-index:9999;width:48px;height:48px;border-radius:50%;background:var(--rojo);border:none;color:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(225,6,0,.45);">&#9835;</button>
+
+<script>window.EVENTO_SLUG='3-anos-alonso';</script>
+<script src="js/photos.js"></script>
+<script src="js/evento-loader.js"></script>
+<script src="visitas.js"></script>
+<script src="js/rsvp-guest.js"></script>
+<script src="js/foro7-footer.js"></script>
+
+<script>
+/* ── Música ──────────────────────────────────────────────────
+   La canción va hecha a la medida para Alonso; mientras no esté
+   subida el botón se esconde solo. ── */
+(function () {
+    const audio = document.getElementById('bgMusic');
+    const btn   = document.getElementById('musicToggle');
+    let playing = false;
+
+    function ocultarBoton() { btn.style.display = 'none'; }
+    const fuente = audio.querySelector('source');
+    if (fuente) fuente.addEventListener('error', ocultarBoton);
+    audio.addEventListener('error', ocultarBoton);
+    audio.addEventListener('stalled', ocultarBoton);
+    setTimeout(function () { if (audio.readyState === 0) ocultarBoton(); }, 6000);
+
+    function encender() {
+        audio.play().then(function () { playing = true; btn.style.opacity = '1'; }).catch(function () {});
+    }
+    btn.addEventListener('click', function () {
+        if (playing) { audio.pause(); btn.style.opacity = '.55'; playing = false; }
+        else encender();
+    });
+    window.__encenderMusica = encender;
+})();
+
+/* ── Splash: las cinco luces de arranque ─────────────────────
+   Se encienden una a una. Al tocar el botón se apagan de golpe,
+   como en la salida de una carrera, y entra la invitación. ── */
+(function () {
+    const splash = document.getElementById('splash');
+    const btn    = document.getElementById('btnArrancar');
+    const luces  = Array.prototype.slice.call(document.querySelectorAll('#semaforo .luz'));
+    if (!splash || !btn) return;
+
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (sinMovimiento) {
+        luces.forEach(function (l) { l.classList.add('on'); });
+    } else {
+        luces.forEach(function (l, i) {
+            setTimeout(function () { l.classList.add('on'); }, 500 + i * 380);
+        });
+    }
+
+    btn.addEventListener('click', function () {
+        luces.forEach(function (l) { l.classList.remove('on'); });   // ¡se apagan: a correr!
+        setTimeout(function () {
+            splash.classList.add('hidden');
+            if (window.__encenderMusica) window.__encenderMusica();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, sinMovimiento ? 0 : 260);
+    });
+})();
+
+/* ── Cuenta regresiva ──────────────────────────────────────── */
+(function () {
+    const fecha = new Date('2026-12-19T15:30:00-06:00');
+    function upd() {
+        const diff = fecha - new Date();
+        const sec  = document.getElementById('cuenta');
+        if (diff <= 0) { if (sec) sec.remove(); return; }
+        const el = function (id, v) { const e = document.getElementById(id); if (e) e.textContent = String(v).padStart(2, '0'); };
+        el('cd-days',    Math.floor(diff / 86400000));
+        el('cd-hours',   Math.floor((diff % 86400000) / 3600000));
+        el('cd-minutes', Math.floor((diff % 3600000) / 60000));
+        el('cd-seconds', Math.floor((diff % 60000) / 1000));
+    }
+    upd(); setInterval(upd, 1000);
+})();
+
+/* ── Agregar al calendario ─────────────────────────────────── */
+(function () {
+    const btn = document.getElementById('btnCalendario');
+    if (!btn) return;
+    function dd(n) { return String(n).padStart(2, '0'); }
+    function aUTC(d) {
+        return d.getUTCFullYear() + dd(d.getUTCMonth() + 1) + dd(d.getUTCDate()) +
+               'T' + dd(d.getUTCHours()) + dd(d.getUTCMinutes()) + '00Z';
+    }
+    btn.addEventListener('click', function () {
+        const inicio = new Date('2026-12-19T15:30:00-06:00');
+        const fin    = new Date('2026-12-19T20:00:00-06:00');
+        const lugar  = (document.querySelector('[data-campo="recepcion-lugar"]') || {}).textContent || '';
+        const dir    = (document.querySelector('[data-campo="recepcion-direccion"]') || {}).textContent || '';
+        const ics = [
+            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FORO 7//Invitacion//ES',
+            'BEGIN:VEVENT',
+            'UID:3-anos-alonso@invitados.org',
+            'DTSTAMP:' + aUTC(new Date()),
+            'DTSTART:' + aUTC(inicio),
+            'DTEND:' + aUTC(fin),
+            'SUMMARY:Alonso cumple 3 anos',
+            'DESCRIPTION:Fiesta de Alonso, tematica de Formula 1. ' + lugar + '.',
+            'LOCATION:' + lugar + ', ' + dir,
+            'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY',
+            'DESCRIPTION:Manana es la fiesta de Alonso',
+            'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'
+        ].join('\r\n');
+        const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'Alonso-3-anos-19-diciembre.ics';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    });
+})();
+
+/* ── Compartir ─────────────────────────────────────────────── */
+(function () {
+    const btn = document.getElementById('btnCompartir');
+    if (!btn) return;
+    const url   = location.origin + location.pathname;
+    const texto = '🏎️ Alonso cumple 3 años · Sábado 19 de diciembre, 3:30 pm · Los Papiros Terraza';
+    btn.addEventListener('click', async function () {
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Alonso cumple 3 años', text: texto, url: url }); return; }
+            catch (e) { if (e && e.name === 'AbortError') return; }
+        }
+        try {
+            await navigator.clipboard.writeText(texto + ' ' + url);
+            const antes = btn.textContent;
+            btn.textContent = '✓ Enlace copiado';
+            setTimeout(function () { btn.textContent = antes; }, 2200);
+        } catch (e) {
+            window.open('https://wa.me/?text=' + encodeURIComponent(texto + ' ' + url), '_blank');
+        }
+    });
+})();
+
+/* ── Galería: aparece sola cuando haya fotos de Alonso ─────── */
+(function () {
+    const fotos  = window.PHOTOS || [];
+    const thumbs = window.PHOTO_THUMBS || [];
+    if (!fotos.length) return;
+
+    const sec  = document.getElementById('galeria');
+    const grid = document.getElementById('galeriaGrid');
+    const n = Math.min(8, fotos.length);
+    let html = '';
+    for (let i = 0; i < n; i++) {
+        html += '<figure tabindex="0" role="button" aria-label="Abrir foto ' + (i + 1) + '">' +
+                '<img src="' + (thumbs[i] || fotos[i]) + '" data-full="' + fotos[i] +
+                '" alt="Alonso, foto ' + (i + 1) + '" loading="lazy" width="300" height="300"></figure>';
+    }
+    grid.innerHTML = html;
+    sec.hidden = false;
+    const nav = document.getElementById('navGaleria');
+    if (nav) nav.hidden = false;
+
+    document.getElementById('heroFoto').style.backgroundImage = "url('" + fotos[0] + "')";
+    document.querySelector('.hero').classList.add('con-foto');
+
+    const imgs = Array.prototype.slice.call(grid.querySelectorAll('img'));
+    const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg');
+    let i = 0;
+    function abrir(k) {
+        i = (k + imgs.length) % imgs.length;
+        lbImg.src = imgs[i].dataset.full || imgs[i].src;
+        lbImg.alt = imgs[i].alt;
+        lb.classList.add('abierto');
+        document.body.style.overflow = 'hidden';
+    }
+    function cerrar() { lb.classList.remove('abierto'); document.body.style.overflow = ''; }
+    imgs.forEach(function (im, k) {
+        const fig = im.parentElement;
+        fig.addEventListener('click', function () { abrir(k); });
+        fig.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(k); }
+        });
+    });
+    document.getElementById('lbCerrar').addEventListener('click', cerrar);
+    document.getElementById('lbPrev').addEventListener('click', function () { abrir(i - 1); });
+    document.getElementById('lbNext').addEventListener('click', function () { abrir(i + 1); });
+    lb.addEventListener('click', function (e) { if (e.target === lb) cerrar(); });
+    document.addEventListener('keydown', function (e) {
+        if (!lb.classList.contains('abierto')) return;
+        if (e.key === 'Escape') cerrar();
+        if (e.key === 'ArrowLeft') abrir(i - 1);
+        if (e.key === 'ArrowRight') abrir(i + 1);
+    });
+})();
+
+/* ── Aparición progresiva ──────────────────────────────────── */
+(function () {
+    const items = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+    let pendiente = false;
+    function revelar() {
+        pendiente = false;
+        for (let i = items.length - 1; i >= 0; i--) {
+            if (items[i].getBoundingClientRect().top < window.innerHeight * 0.9) {
+                items[i].classList.add('visible');
+                items.splice(i, 1);
+            }
+        }
+        if (!items.length) window.removeEventListener('scroll', alScroll);
+    }
+    function alScroll() {
+        if (pendiente) return;
+        pendiente = true;
+        window.requestAnimationFrame(revelar);
+    }
+    window.addEventListener('scroll', alScroll, { passive: true });
+    window.addEventListener('resize', alScroll, { passive: true });
+    window.addEventListener('hashchange', alScroll);
+    revelar();
+})();
+
+/* ── Vestimenta desde eventos_config ───────────────────────── */
+(function () {
+    const SB_URL  = 'https://nzpujmlienzfetqcgsxz.supabase.co';
+    const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cHVqbWxpZW56ZmV0cWNnc3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODYzMzYsImV4cCI6MjA5MDI2MjMzNn0.xl3lsb-KYj5tVLKTnzpbsdEGoV9ySnswH4eyRuyEH1s';
+    const H = { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON };
+    fetch(SB_URL + '/rest/v1/eventos?slug=eq.3-anos-alonso&select=id&limit=1', { headers: H })
+        .then(function (r) { return r.json(); })
+        .then(function (rows) {
+            if (!rows || !rows.length) return null;
+            return fetch(SB_URL + '/rest/v1/eventos_config?evento_id=eq.' + rows[0].id + '&select=seccion,datos', { headers: H })
+                .then(function (r) { return r.json(); });
+        })
+        .then(function (cfgArr) {
+            if (!cfgArr) return;
+            const cfg = {};
+            cfgArr.forEach(function (r) { cfg[r.seccion] = r.datos || {}; });
+            const v = cfg.vestimenta || {};
+            if (v.tipo || v.colores_reservados) document.getElementById('cardVestimenta').hidden = false;
+        })
+        .catch(function () {});
+})();
+
+/* ── RSVP ──────────────────────────────────────────────────── */
+(function () {
+    const token = new URLSearchParams(window.location.search).get('inv');
+    if (token) return;
+    const SB_URL  = 'https://nzpujmlienzfetqcgsxz.supabase.co';
+    const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cHVqbWxpZW56ZmV0cWNnc3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODYzMzYsImV4cCI6MjA5MDI2MjMzNn0.xl3lsb-KYj5tVLKTnzpbsdEGoV9ySnswH4eyRuyEH1s';
+    const SB_H    = { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON, 'Content-Type': 'application/json' };
+    const SLUG    = '3-anos-alonso';
+    const WA_NUMS = ['5214775492081'];   // Analí (mamá)
+    const NOMBRE_EVENTO = 'los 3 años de Alonso';
+
+    function buildNombreInputs(count) {
+        const container = document.getElementById('nombresContainer');
+        const group     = document.getElementById('nombresGroup');
+        if (!container || !group) return;
+        container.innerHTML = '';
+        const numAcomp = Math.max(0, count - 1);
+        group.style.display = numAcomp > 0 ? 'block' : 'none';
+        for (let i = 0; i < numAcomp; i++) {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.className = 'nombre-asistente';
+            inp.placeholder = 'Acompañante ' + (i + 1);
+            inp.style.cssText = 'width:100%;padding:10px;margin-bottom:6px;border:1px solid #33333b;border-radius:4px;background:#0d0d0f;color:#f4f4f6;font-size:.95rem;';
+            container.appendChild(inp);
+        }
+    }
+
+    function attachHandler() {
+        const form = document.getElementById('rsvpForm');
+        if (!form) return;
+        const guestsInput = document.getElementById('guests');
+        if (guestsInput) {
+            guestsInput.addEventListener('change', function () { buildNombreInputs(parseInt(this.value) || 1); });
+            guestsInput.addEventListener('input',  function () { buildNombreInputs(parseInt(this.value) || 1); });
+            buildNombreInputs(parseInt(guestsInput.value) || 1);
+        }
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const nombre  = (document.getElementById('name')?.value || '').trim();
+            const pases   = parseInt(document.getElementById('guests')?.value || '1');
+            const asiste  = document.getElementById('attendance')?.value === 'si';
+            const mensaje = (document.getElementById('message')?.value || '').trim();
+            const nombres = Array.from(document.querySelectorAll('.nombre-asistente'))
+                                 .map(function (inp) { return inp.value.trim(); }).filter(Boolean);
+            if (!nombre) return;
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+            try {
+                const evR = await fetch(`${SB_URL}/rest/v1/eventos?slug=eq.${SLUG}&select=id&limit=1`, { headers: SB_H });
+                const [ev] = await evR.json();
+                if (ev?.id) {
+                    const r_inv = await fetch(`${SB_URL}/rest/v1/invitados`, {
+                        method: 'POST',
+                        headers: { ...SB_H, Prefer: 'return=representation' },
+                        body: JSON.stringify({
+                            evento_id: ev.id, nombre,
+                            pases_asignados: pases, pases_confirmados: pases,
+                            asiste, status: asiste ? 'confirmada' : 'declinada',
+                            mensaje: mensaje || null,
+                            fecha_confirmacion: new Date().toISOString()
+                        })
+                    });
+                    const [inv] = await r_inv.json();
+                    if (inv?.id && nombres.length) {
+                        await fetch(`${SB_URL}/rest/v1/acompanantes`, {
+                            method: 'POST', headers: { ...SB_H, Prefer: 'return=minimal' },
+                            body: JSON.stringify(nombres.map(function (n, i) { return { invitado_id: inv.id, nombre: n, orden: i }; }))
+                        });
+                    }
+                }
+            } catch (err) {}
+            form.style.display = 'none';
+            const succ = document.getElementById('successMessage');
+            if (succ) succ.style.display = 'block';
+            const txt = asiste
+                ? `Hola, confirmo mi asistencia a ${NOMBRE_EVENTO}.\nNombre: ${nombre}\nPersonas: ${pases}${nombres.length ? '\nAcompañantes: ' + nombres.join(', ') : ''}${mensaje ? '\nMensaje: ' + mensaje : ''}`
+                : `Hola, lamentablemente no podré asistir a ${NOMBRE_EVENTO}.\nNombre: ${nombre}${mensaje ? '\nMensaje: ' + mensaje : ''}`;
+            WA_NUMS.forEach(function (num, i) {
+                setTimeout(function () { window.open(`https://wa.me/${num}?text=${encodeURIComponent(txt)}`, '_blank'); }, 400 + i * 600);
+            });
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attachHandler);
+    else attachHandler();
+})();
+
+/* ── Invitación personalizada con ?inv=token ───────────────── */
+(function () {
+    const token = new URLSearchParams(window.location.search).get('inv');
+    if (!token) return;
+    const SB_URL  = 'https://nzpujmlienzfetqcgsxz.supabase.co';
+    const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cHVqbWxpZW56ZmV0cWNnc3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODYzMzYsImV4cCI6MjA5MDI2MjMzNn0.xl3lsb-KYj5tVLKTnzpbsdEGoV9ySnswH4eyRuyEH1s';
+    fetch(SB_URL + '/rest/v1/invitados?token=eq.' + encodeURIComponent(token) + '&select=nombre,pases_asignados&limit=1',
+          { headers: { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON } })
+        .then(function (r) { return r.json(); })
+        .then(function (rows) {
+            if (!rows || !rows.length) return;
+            const g = rows[0];
+            const sub = document.getElementById('splashSubtitle');
+            const gEl = document.getElementById('splashGuest');
+            const pEl = document.getElementById('splashPases');
+            const btn = document.getElementById('btnArrancar');
+            if (sub) sub.textContent = 'Hola,';
+            if (gEl) { gEl.textContent = g.nombre; gEl.style.display = 'block'; }
+            if (pEl) { pEl.textContent = '🎟 ' + g.pases_asignados + ' ' + (g.pases_asignados === 1 ? 'lugar' : 'lugares'); pEl.style.display = 'block'; }
+            if (btn) btn.textContent = 'Ver mi invitación';
+        })
+        .catch(function () {});
+})();
+</script>
+</body>
+</html>

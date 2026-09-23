@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="18" fill="#0d0d0f"/>
+  <!-- Bandera a cuadros -->
+  <g fill="#ffffff">
+    <rect x="14" y="14" width="12" height="12"/><rect x="38" y="14" width="12" height="12"/>
+    <rect x="26" y="26" width="12" height="12"/><rect x="50" y="26" width="12" height="12"/>
+  </g>
+  <!-- Dorsal -->
+  <text x="58" y="82" font-family="Arial Black, sans-serif" font-size="54"
+        fill="#e10600" text-anchor="middle" font-weight="900">3</text>
+</svg>
