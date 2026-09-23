@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d0d0f">
     <title>Alonso cumple 3 años</title>
     <meta name="description" content="¡Alonso cumple 3 años! Sábado 19 de diciembre de 2026, 3:30 pm · Los Papiros Terraza, León, Gto.">
-    <meta property="og:title" content="Alonso cumple 3 años 🏎️">
+    <meta property="og:title" content="Alonso Lerma Sánchez cumple 3 años 🏎️">
     <meta property="og:description" content="Sábado 19 de diciembre de 2026 · 3:30 pm · Los Papiros Terraza">
     <meta property="og:type" content="website">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -224,6 +224,51 @@
         }
         @keyframes flotar { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,8px)} }
 
+        .hero-apellidos {
+            font-size: clamp(.85rem, 3vw, 1.05rem); font-weight: 600;
+            letter-spacing: .34em; text-transform: uppercase;
+            color: var(--gris); margin-top: .5rem;
+        }
+
+        /* ── Línea de tiempo: cada año es una vuelta ────────── */
+        .vueltas { max-width: 780px; margin: 0 auto; }
+        .vuelta { margin-bottom: 2.6rem; }
+        .vuelta-cabecera {
+            display: flex; align-items: center; gap: 14px; margin-bottom: 1rem;
+        }
+        .vuelta-num {
+            flex: 0 0 auto;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 46px; height: 46px; border-radius: 6px;
+            background: var(--rojo); color: #fff;
+            font-family: 'Racing Sans One', cursive; font-size: 1.5rem;
+            transform: skewX(-8deg);
+        }
+        .vuelta-num span { transform: skewX(8deg); margin-top: .2rem; }
+        .vuelta-titulo {
+            font-family: 'Racing Sans One', cursive;
+            font-size: clamp(1.15rem, 4vw, 1.6rem);
+            color: var(--blanco); text-transform: uppercase; line-height: 1.1;
+        }
+        .vuelta-sub { color: var(--gris); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; }
+        .vuelta-fotos {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 9px;
+            border-left: 2px solid var(--linea); padding-left: 16px; margin-left: 22px;
+        }
+
+        /* ── Papás ──────────────────────────────────────────── */
+        .papas { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; max-width: 620px; margin: 0 auto; }
+        .papa-item {
+            background: var(--asfalto-2); border: 1px solid var(--linea);
+            border-top: 3px solid var(--rojo); border-radius: 6px;
+            padding: 1.2rem; text-align: center;
+        }
+        .papa-rol {
+            font-size: .68rem; font-weight: 700; letter-spacing: .2em;
+            text-transform: uppercase; color: var(--rojo); margin-bottom: .3rem;
+        }
+        .papa-nombre { color: var(--blanco); font-size: 1rem; font-weight: 600; }
+
         /* ── Navegación ─────────────────────────────────────── */
         .nav-sticky {
             position: sticky; top: 0; z-index: 400;
@@ -436,6 +481,7 @@
             <div class="dorsal"><span>3</span></div>
             <p class="hero-eyebrow">Mis tres años</p>
             <h1 class="hero-nombre">Alonso</h1>
+            <p class="hero-apellidos">Lerma Sánchez</p>
             <p class="hero-edad"><span>🏎️ ¡Vamos a correr!</span></p>
             <p class="hero-fecha">19 · 12 · 2026</p>
             <p class="hero-lugar">Los Papiros Terraza · León, Gto.</p>
@@ -448,7 +494,8 @@
         <a href="#cuenta">Salida en</a>
         <a href="#circuito">El circuito</a>
         <a href="#boches">Boches</a>
-        <a href="#galeria" id="navGaleria" hidden>Galería</a>
+        <a href="#escuderia">Escudería</a>
+        <a href="#galeria" id="navGaleria" hidden>Sus vueltas</a>
         <a href="#rsvp">Confirmar</a>
     </nav>
 
@@ -502,6 +549,27 @@
 
     <div class="cuadros delgada"></div>
 
+    <!-- ═════════ SU ESCUDERÍA ═════════ -->
+    <section class="seccion" id="escuderia">
+        <div class="container reveal">
+            <h2 class="section-title">Su <em>escudería</em></h2>
+            <p class="subtitulo-seccion">Con el cariño de</p>
+            <div class="franja-roja"></div>
+            <div class="papas">
+                <div class="papa-item">
+                    <div class="papa-rol">Papá</div>
+                    <div class="papa-nombre" data-campo="padre-nombre">Alejandro Lerma</div>
+                </div>
+                <div class="papa-item">
+                    <div class="papa-rol">Mamá</div>
+                    <div class="papa-nombre" data-campo="madre-nombre">Analí Sánchez</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="cuadros delgada"></div>
+
     <!-- ═════════ BOCHES ═════════ -->
     <section class="seccion oscura" id="boches">
         <div class="container reveal">
@@ -514,12 +582,15 @@
         </div>
     </section>
 
-    <!-- ═════════ GALERÍA (aparece si hay fotos) ═════════ -->
+    <!-- ═════════ SUS TRES VUELTAS (aparece si hay fotos) ═════════
+         Si los archivos vienen con prefijo 1- 2- 3- 4- se arma la
+         línea de tiempo; si no, cae en una rejilla normal. -->
     <section class="seccion" id="galeria" hidden>
         <div class="container reveal">
-            <h2 class="section-title">El <em>piloto</em></h2>
-            <p class="subtitulo-seccion">Alonso</p>
+            <h2 class="section-title">Sus tres <em>vueltas</em></h2>
+            <p class="subtitulo-seccion">De bebé a piloto</p>
             <div class="franja-roja"></div>
+            <div class="vueltas" id="vueltasCont"></div>
             <div class="galeria" id="galeriaGrid"></div>
         </div>
     </section>
@@ -733,24 +804,64 @@
     const thumbs = window.PHOTO_THUMBS || [];
     if (!fotos.length) return;
 
-    const sec  = document.getElementById('galeria');
-    const grid = document.getElementById('galeriaGrid');
-    const n = Math.min(8, fotos.length);
-    let html = '';
-    for (let i = 0; i < n; i++) {
-        html += '<figure tabindex="0" role="button" aria-label="Abrir foto ' + (i + 1) + '">' +
-                '<img src="' + (thumbs[i] || fotos[i]) + '" data-full="' + fotos[i] +
-                '" alt="Alonso, foto ' + (i + 1) + '" loading="lazy" width="300" height="300"></figure>';
+    const archivos = window.PHOTO_FILES || [];
+    const sec   = document.getElementById('galeria');
+    const grid  = document.getElementById('galeriaGrid');
+    const cont  = document.getElementById('vueltasCont');
+
+    // Etapas: se detectan por el prefijo del nombre del archivo.
+    //   1-*.webp  la salida      2-*.webp  primera vuelta
+    //   3-*.webp  segunda vuelta 4-*.webp  tercera vuelta
+    const ETAPAS = [
+        { p: '1', num: '0', titulo: 'La salida',     sub: 'Recién llegado a la pista' },
+        { p: '2', num: '1', titulo: 'Primera vuelta', sub: 'Su primer año' },
+        { p: '3', num: '2', titulo: 'Segunda vuelta', sub: 'Dos años' },
+        { p: '4', num: '3', titulo: 'Tercera vuelta', sub: '¡Y llegamos a la meta!' }
+    ];
+
+    function tarjeta(i) {
+        return '<figure tabindex="0" role="button" aria-label="Abrir foto ' + (i + 1) + '">' +
+               '<img src="' + (thumbs[i] || fotos[i]) + '" data-full="' + fotos[i] +
+               '" alt="Alonso, foto ' + (i + 1) + '" loading="lazy" width="300" height="300"></figure>';
     }
-    grid.innerHTML = html;
+
+    // ¿Los archivos traen prefijo de etapa?
+    const conPrefijo = archivos.length === fotos.length &&
+                       archivos.some(function (f) { return /^[1-4][-_]/.test(f); });
+
+    if (conPrefijo) {
+        let html = '';
+        ETAPAS.forEach(function (et) {
+            const idx = [];
+            archivos.forEach(function (f, i) {
+                if (f.charAt(0) === et.p && /^[1-4][-_]/.test(f)) idx.push(i);
+            });
+            if (!idx.length) return;
+            html += '<div class="vuelta">' +
+                    '<div class="vuelta-cabecera">' +
+                        '<div class="vuelta-num"><span>' + et.num + '</span></div>' +
+                        '<div><div class="vuelta-titulo">' + et.titulo + '</div>' +
+                        '<div class="vuelta-sub">' + et.sub + '</div></div>' +
+                    '</div>' +
+                    '<div class="vuelta-fotos">' + idx.map(tarjeta).join('') + '</div>' +
+                    '</div>';
+        });
+        cont.innerHTML = html;
+    } else {
+        // Sin prefijos: rejilla normal con las primeras 12.
+        let html = '';
+        for (let i = 0; i < Math.min(12, fotos.length); i++) html += tarjeta(i);
+        grid.innerHTML = html;
+    }
+
     sec.hidden = false;
     const nav = document.getElementById('navGaleria');
     if (nav) nav.hidden = false;
 
-    document.getElementById('heroFoto').style.backgroundImage = "url('" + fotos[0] + "')";
+    document.getElementById('heroFoto').style.backgroundImage = "url('" + fotos[fotos.length - 1] + "')";
     document.querySelector('.hero').classList.add('con-foto');
 
-    const imgs = Array.prototype.slice.call(grid.querySelectorAll('img'));
+    const imgs = Array.prototype.slice.call(sec.querySelectorAll('img'));
     const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg');
     let i = 0;
     function abrir(k) {
