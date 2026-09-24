@@ -371,14 +371,24 @@
 
         /* ── Galería (aparece si hay fotos) ─────────────────── */
         .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-        .galeria figure {
+        /* Vale para la rejilla y para la línea de tiempo: las figuras
+           de las vueltas viven en .vuelta-fotos, fuera de .galeria. */
+        .galeria figure,
+        .vuelta-fotos figure {
             margin: 0; border-radius: 6px; overflow: hidden;
-            aspect-ratio: 1 / 1; cursor: pointer;
+            aspect-ratio: 3 / 4; cursor: pointer;
             background: var(--asfalto-2); border: 1px solid var(--linea);
         }
-        .galeria img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
-        .galeria figure:hover img { transform: scale(1.07); }
-        .galeria figure:focus-visible { outline: 3px solid var(--rojo); outline-offset: 2px; }
+        .galeria img,
+        .vuelta-fotos img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center 30%;   /* la cara, no los pies */
+            transition: transform .4s ease;
+        }
+        .galeria figure:hover img,
+        .vuelta-fotos figure:hover img { transform: scale(1.07); }
+        .galeria figure:focus-visible,
+        .vuelta-fotos figure:focus-visible { outline: 3px solid var(--rojo); outline-offset: 2px; }
 
         .lb { position: fixed; inset: 0; z-index: 9400; background: rgba(5,5,7,.96);
               display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -767,16 +777,17 @@ const Motor = (function () {
         vol.gain.linearRampToValueAtTime(0.03 + nivel * 0.05, t + d);
     }
 
-    /* Acelerón de salida y apagado */
+    /* Acelerón de salida: corto y con corte seco, para que se
+       distinga del inicio de la canción en vez de mezclarse. */
     function salir() {
         if (!encendido) return;
         const t = ctx.currentTime;
-        osc1.frequency.linearRampToValueAtTime(240, t + .5);
-        osc2.frequency.linearRampToValueAtTime(243, t + .5);
-        filtro.frequency.linearRampToValueAtTime(2600, t + .5);
-        vol.gain.linearRampToValueAtTime(0.12, t + .25);
-        vol.gain.linearRampToValueAtTime(0, t + 1.1);
-        setTimeout(apagar, 1300);
+        osc1.frequency.linearRampToValueAtTime(260, t + .3);
+        osc2.frequency.linearRampToValueAtTime(263, t + .3);
+        filtro.frequency.linearRampToValueAtTime(3000, t + .3);
+        vol.gain.linearRampToValueAtTime(0.16, t + .18);   // golpe
+        vol.gain.linearRampToValueAtTime(0, t + .62);      // corte
+        setTimeout(apagar, 700);
     }
 
     function apagar() {
@@ -845,11 +856,11 @@ const Motor = (function () {
             splash.classList.add('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }, sinMovimiento ? 0 : 420);
-        // La canción entra cuando el acelerón ya va bajando, para que
-        // el motor le dé paso en vez de encimarse con ella.
+        // El motor se apaga a los 700 ms; la canción entra a los 1000,
+        // con un respiro de por medio para que se distingan.
         setTimeout(function () {
             if (window.__encenderMusica) window.__encenderMusica();
-        }, sinMovimiento ? 0 : 900);
+        }, sinMovimiento ? 0 : 1000);
     });
 })();
 
@@ -952,7 +963,7 @@ const Motor = (function () {
     function tarjeta(i) {
         return '<figure tabindex="0" role="button" aria-label="Abrir foto ' + (i + 1) + '">' +
                '<img src="' + (thumbs[i] || fotos[i]) + '" data-full="' + fotos[i] +
-               '" alt="Alonso, foto ' + (i + 1) + '" loading="lazy" width="300" height="300"></figure>';
+               '" alt="Alonso, foto ' + (i + 1) + '" loading="lazy" width="300" height="400"></figure>';
     }
 
     // ¿Los archivos traen prefijo de etapa?
