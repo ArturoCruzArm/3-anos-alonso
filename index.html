@@ -480,6 +480,11 @@
         </div>
     </div>
 
+    <!-- Motor: dos archivos, para que suene igual en teléfono y en
+         computadora. preload auto para que no llegue tarde. -->
+    <audio id="sndArranque" src="audio/motor-arranque.mp3" preload="auto"></audio>
+    <audio id="sndAcelerada" src="audio/motor-acelerada.mp3" preload="auto"></audio>
+
     <audio id="bgMusic" loop preload="metadata">
         <source src="audio/cancion-alonso-f1.mp3" type="audio/mpeg">
     </audio>
@@ -712,127 +717,69 @@
    por un filtro que se abre conforme sube de revoluciones. No hay
    archivo que descargar ni sonido ajeno de por medio. ── */
 const Motor = (function () {
-    let ctx = null, grave = null, agudo = null, filtro = null, vol = null, curva = null;
-    let encendido = false, saliendo = false;
+    /* Dos archivos, no síntesis: es lo único que suena parejo en
+       computadora y en teléfono. Vienen comprimidos y a tope de
+       volumen, porque el altavoz de un celular da lo que da. */
+    const arranque = document.getElementById('sndArranque');
+    const acelerada = document.getElementById('sndAcelerada');
+    let saliendo = false, sonando = false;
 
-    /* Curva de distorsión suave. Genera armónicos altos, que son los
-       que sí salen por el altavoz de un teléfono; el oído rearma el
-       grave a partir de ellos. */
-    function hacerCurva() {
-        const n = 1024, c = new Float32Array(n);
-        for (let i = 0; i < n; i++) {
-            const x = (i * 2) / n - 1;
-            c[i] = Math.tanh(x * 2.2);
-        }
-        return c;
-    }
-
-    /* iOS no despierta el audio hasta reproducir algo, aunque sea un
-       silencio de un frame. */
-    function despertar() {
-        try {
-            const b = ctx.createBuffer(1, 1, 22050);
-            const f = ctx.createBufferSource();
-            f.buffer = b; f.connect(ctx.destination); f.start(0);
-        } catch (e) {}
-    }
-
-    function reanudar() {
-        if (ctx && ctx.state === 'suspended') {
-            const p = ctx.resume();
-            if (p && p.then) p.then(despertar).catch(function () {});
-            else despertar();
-        }
+    function preparar() {
+        [arranque, acelerada].forEach(function (a) {
+            if (a) { a.volume = 1; a.load(); }
+        });
     }
 
     function arrancar() {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return false;
-        if (!ctx) { ctx = new AC(); despertar(); }
-        reanudar();
-        if (encendido) return true;
-
-        grave = ctx.createOscillator();
-        agudo = ctx.createOscillator();
-        grave.type = 'sawtooth';
-        agudo.type = 'square';        // más armónicos: se oye en bocina chica
-
-        // La distorsión es opcional: si el navegador no la trae,
-        // el motor sigue sonando, solo con menos armónicos.
+        if (!arranque) return false;
+        saliendo = false;
         try {
-            curva = ctx.createWaveShaper();
-            curva.curve = hacerCurva();
-            curva.oversample = '2x';
-        } catch (e) { curva = null; }
-
-        filtro = ctx.createBiquadFilter();
-        filtro.type = 'lowpass';
-        filtro.frequency.value = 900;
-        filtro.Q.value = 3;
-
-        vol = ctx.createGain();
-        vol.gain.value = 0.10;        // ralentí ya audible
-
-        if (curva) {
-            grave.connect(curva); agudo.connect(curva); curva.connect(filtro);
-        } else {
-            grave.connect(filtro); agudo.connect(filtro);
-        }
-        filtro.connect(vol); vol.connect(ctx.destination);
-
-        grave.frequency.value = 90;
-        agudo.frequency.value = 90 * 2.01;   // octava arriba, apenas desafinada
-        grave.start(); agudo.start();
-        encendido = true; saliendo = false;
-        return true;
+            arranque.currentTime = 0;
+            const p = arranque.play();
+            if (p && p.catch) p.catch(function () {});
+            sonando = true;
+            return true;
+        } catch (e) { return false; }
     }
 
-    /* Sube de revoluciones: 0 = ralentí, 1 = a fondo */
-    function revolucionar(nivel, segundos) {
-        if (!encendido || saliendo) return;
-        const t = ctx.currentTime, d = segundos || .35;
-        const hz = 90 + nivel * 240;
-        grave.frequency.linearRampToValueAtTime(hz, t + d);
-        agudo.frequency.linearRampToValueAtTime(hz * 2.01, t + d);
-        filtro.frequency.linearRampToValueAtTime(900 + nivel * 2600, t + d);
-        vol.gain.linearRampToValueAtTime(0.10 + nivel * 0.14, t + d);
-    }
+    /* El mp3 ya trae la subida de revoluciones; se conserva la
+       función para no cambiar quien la llama. */
+    function revolucionar() {}
 
-    /* Acelerón de salida: corto y con corte seco */
     function salir() {
-        if (!encendido || saliendo) return;
+        if (saliendo) return;
         saliendo = true;
-        const t = ctx.currentTime;
-
-        // Borrar lo que las luces hubieran dejado programado
-        [vol.gain, grave.frequency, agudo.frequency, filtro.frequency].forEach(function (p) {
-            p.cancelScheduledValues(t);
-            p.setValueAtTime(p.value, t);
-        });
-
-        grave.frequency.linearRampToValueAtTime(480, t + .3);
-        agudo.frequency.linearRampToValueAtTime(965, t + .3);
-        filtro.frequency.linearRampToValueAtTime(6000, t + .3);
-        vol.gain.linearRampToValueAtTime(0.38, t + .18);   // golpe
-        vol.gain.linearRampToValueAtTime(0, t + .62);      // corte
-        setTimeout(apagar, 700);
+        try {
+            if (arranque) { arranque.pause(); arranque.currentTime = 0; }
+            if (acelerada) {
+                acelerada.currentTime = 0;
+                const p = acelerada.play();
+                if (p && p.catch) p.catch(function () {});
+            }
+        } catch (e) {}
     }
 
     function apagar() {
-        if (!encendido) return;
-        try { grave.stop(); agudo.stop(); } catch (e) {}
-        encendido = false;
+        [arranque, acelerada].forEach(function (a) {
+            try { if (a) { a.pause(); a.currentTime = 0; } } catch (e) {}
+        });
+        sonando = false;
     }
 
-    return { arrancar: arrancar, revolucionar: revolucionar, salir: salir,
-             apagar: apagar, reanudar: reanudar,
-             activo: function () { return encendido && ctx && ctx.state === 'running'; },
-             estado: function () {
-                 return { contexto: ctx ? ctx.state : 'sin contexto',
-                          encendido: encendido, saliendo: saliendo,
-                          volumen: vol ? Number(vol.gain.value.toFixed(3)) : null,
-                          frecuencia: grave ? Math.round(grave.frequency.value) : null };
-             } };
+    return {
+        arrancar: arrancar, revolucionar: revolucionar, salir: salir,
+        apagar: apagar, reanudar: preparar,
+        activo: function () { return sonando; },
+        estado: function () {
+            return {
+                arranque: arranque ? (arranque.paused ? 'detenido' : 'sonando') : 'sin elemento',
+                listo: arranque ? arranque.readyState : null,
+                error: arranque && arranque.error ? arranque.error.code : 'no',
+                acelerada: acelerada ? (acelerada.paused ? 'detenida' : 'sonando') : 'sin elemento',
+                saliendo: saliendo
+            };
+        }
+    };
 })();
 
 /* ── Splash: las cinco luces de arranque ─────────────────────
@@ -863,10 +810,11 @@ const Motor = (function () {
             return;
         }
         luces.forEach(function (l, i) {
+            // El arranque dura 2.65 s: 0.45 de marcha y 2.2 subiendo.
+            // Las luces acompañan esa subida.
             temporizadores.push(setTimeout(function () {
                 l.classList.add('on');
-                if (hayMotor) Motor.revolucionar((i + 1) / luces.length, .3);
-            }, i * 420));
+            }, 500 + i * 400));
         });
     }
 
@@ -879,7 +827,7 @@ const Motor = (function () {
     setTimeout(function () {
         if (!secuenciaCorrida && !sinMovimiento) {
             luces.forEach(function (l, i) {
-                setTimeout(function () { l.classList.add('on'); }, i * 420);
+                setTimeout(function () { l.classList.add('on'); }, 500 + i * 400);
             });
         }
     }, 2600);
@@ -897,7 +845,7 @@ const Motor = (function () {
         // apenas arrancó, se le dan unas décimas para que se oiga la
         // subida antes del acelerón.
         const transcurrido = Date.now() - arrancadoEn;
-        const espera = sinMovimiento ? 0 : Math.max(0, 450 - transcurrido);
+        const espera = sinMovimiento ? 0 : Math.max(0, 600 - transcurrido);
 
         setTimeout(function () {
             luces.forEach(function (l) { l.classList.remove('on'); });   // ¡se apagan: a correr!
@@ -906,12 +854,12 @@ const Motor = (function () {
             setTimeout(function () {
                 splash.classList.add('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, sinMovimiento ? 0 : 320);
-            // El motor se apaga a los 700 ms; la canción entra después,
-            // con un respiro de por medio para que se distingan.
+            }, sinMovimiento ? 0 : 400);
+            // El acelerón dura 1.05 s; la canción entra al final,
+            // para que se oiga completo y no se encimen.
             setTimeout(function () {
                 if (window.__encenderMusica) window.__encenderMusica();
-            }, sinMovimiento ? 0 : 1000);
+            }, sinMovimiento ? 0 : 950);
         }, espera);
     });
 })();
@@ -931,11 +879,10 @@ const Motor = (function () {
         const m = (typeof Motor !== 'undefined' && Motor.estado) ? Motor.estado() : {};
         caja.textContent =
             'MOTOR\n' +
-            '  contexto   ' + (m.contexto || '—') + '\n' +
-            '  encendido  ' + m.encendido + '\n' +
+            '  arranque   ' + (m.arranque || '—') + '\n' +
+            '  listo      ' + m.listo + '   error ' + m.error + '\n' +
+            '  acelerada  ' + (m.acelerada || '—') + '\n' +
             '  saliendo   ' + m.saliendo + '\n' +
-            '  volumen    ' + m.volumen + '\n' +
-            '  frecuencia ' + m.frecuencia + ' Hz\n' +
             'CANCION\n' +
             '  red        ' + audio.networkState + '  listo ' + audio.readyState + '\n' +
             '  pausada    ' + audio.paused + '\n' +
