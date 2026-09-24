@@ -533,10 +533,10 @@
                        href="https://www.google.com/maps/search/?api=1&query=Los%20Papiros%20Terraza%20Thomas%20Alva%20Edison%20321%20El%20Peluch%C3%A1n%20Le%C3%B3n%20Guanajuato">Ver en mapa →</a>
                 </div>
 
-                <div class="card" data-opcional id="cardVestimenta" hidden>
-                    <h3>👕 Uniforme de escudería</h3>
-                    <p><strong data-campo="vestimenta-tipo"></strong></p>
-                    <p style="margin-top:.4rem;" data-campo="vestimenta-colores"></p>
+                <div class="card">
+                    <h3>👕 Cómo venir</h3>
+                    <span class="dato-grande">Como gustes</span>
+                    <p>No hay código de vestimenta. Ven cómodo, que aquí se corre.</p>
                 </div>
             </div>
 
@@ -695,6 +695,77 @@
     window.__encenderMusica = encender;
 })();
 
+/* ── Sonido del motor ────────────────────────────────────────
+   Alonso imita mucho el carro arrancando, así que las luces van
+   acompañadas de un motor. Se sintetiza aquí mismo con Web Audio:
+   dos osciladores diente de sierra desafinados entre sí, pasados
+   por un filtro que se abre conforme sube de revoluciones. No hay
+   archivo que descargar ni sonido ajeno de por medio. ── */
+const Motor = (function () {
+    let ctx = null, osc1 = null, osc2 = null, filtro = null, vol = null, encendido = false;
+
+    function arrancar() {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return false;
+        if (!ctx) ctx = new AC();
+        if (ctx.state === 'suspended') ctx.resume();
+        if (encendido) return true;
+
+        osc1 = ctx.createOscillator();
+        osc2 = ctx.createOscillator();
+        osc1.type = 'sawtooth';
+        osc2.type = 'sawtooth';
+
+        filtro = ctx.createBiquadFilter();
+        filtro.type = 'lowpass';
+        filtro.frequency.value = 220;
+        filtro.Q.value = 6;
+
+        vol = ctx.createGain();
+        vol.gain.value = 0;
+
+        osc1.connect(filtro); osc2.connect(filtro);
+        filtro.connect(vol); vol.connect(ctx.destination);
+
+        osc1.frequency.value = 46;
+        osc2.frequency.value = 46 * 1.012;   // desafine leve: da cuerpo
+        osc1.start(); osc2.start();
+        encendido = true;
+        return true;
+    }
+
+    /* Sube de revoluciones: 0 = ralentí, 1 = a fondo */
+    function revolucionar(nivel, segundos) {
+        if (!encendido) return;
+        const t = ctx.currentTime, d = segundos || .35;
+        const hz = 46 + nivel * 58;
+        osc1.frequency.linearRampToValueAtTime(hz, t + d);
+        osc2.frequency.linearRampToValueAtTime(hz * 1.012, t + d);
+        filtro.frequency.linearRampToValueAtTime(220 + nivel * 900, t + d);
+        vol.gain.linearRampToValueAtTime(0.03 + nivel * 0.05, t + d);
+    }
+
+    /* Acelerón de salida y apagado */
+    function salir() {
+        if (!encendido) return;
+        const t = ctx.currentTime;
+        osc1.frequency.linearRampToValueAtTime(240, t + .5);
+        osc2.frequency.linearRampToValueAtTime(243, t + .5);
+        filtro.frequency.linearRampToValueAtTime(2600, t + .5);
+        vol.gain.linearRampToValueAtTime(0.12, t + .25);
+        vol.gain.linearRampToValueAtTime(0, t + 1.1);
+        setTimeout(apagar, 1300);
+    }
+
+    function apagar() {
+        if (!encendido) return;
+        try { osc1.stop(); osc2.stop(); } catch (e) {}
+        encendido = false;
+    }
+
+    return { arrancar: arrancar, revolucionar: revolucionar, salir: salir, apagar: apagar };
+})();
+
 /* ── Splash: las cinco luces de arranque ─────────────────────
    Se encienden una a una. Al tocar el botón se apagan de golpe,
    como en la salida de una carrera, y entra la invitación. ── */
@@ -705,21 +776,48 @@
     if (!splash || !btn) return;
 
     const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (sinMovimiento) {
-        luces.forEach(function (l) { l.classList.add('on'); });
-    } else {
+
+    /* El navegador no deja sonar nada antes de que la persona toque
+       la pantalla, así que el motor arranca con el primer toque y
+       las luces se encienden en ese momento. */
+    let secuenciaCorrida = false;
+    function correrSecuencia() {
+        if (secuenciaCorrida) return;
+        secuenciaCorrida = true;
+        const hayMotor = Motor.arrancar();
+        if (sinMovimiento) {
+            luces.forEach(function (l) { l.classList.add('on'); });
+            if (hayMotor) Motor.revolucionar(.5, .2);
+            return;
+        }
         luces.forEach(function (l, i) {
-            setTimeout(function () { l.classList.add('on'); }, 500 + i * 380);
+            setTimeout(function () {
+                l.classList.add('on');
+                if (hayMotor) Motor.revolucionar((i + 1) / luces.length, .3);
+            }, i * 420);
         });
     }
 
+    // Cualquier toque en el splash arranca el motor y las luces
+    splash.addEventListener('pointerdown', correrSecuencia, { once: true });
+    // Y si nadie toca, las luces se encienden solas (sin sonido)
+    setTimeout(function () {
+        if (!secuenciaCorrida && !sinMovimiento) {
+            luces.forEach(function (l, i) {
+                setTimeout(function () { l.classList.add('on'); }, i * 420);
+            });
+        }
+    }, 2600);
+
     btn.addEventListener('click', function () {
+        correrSecuencia();
         luces.forEach(function (l) { l.classList.remove('on'); });   // ¡se apagan: a correr!
+        Motor.salir();                                                // acelerón de salida
         setTimeout(function () {
             splash.classList.add('hidden');
             if (window.__encenderMusica) window.__encenderMusica();
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, sinMovimiento ? 0 : 260);
+        }, sinMovimiento ? 0 : 420);
     });
 })();
 
@@ -858,7 +956,10 @@
     const nav = document.getElementById('navGaleria');
     if (nav) nav.hidden = false;
 
-    document.getElementById('heroFoto').style.backgroundImage = "url('" + fotos[fotos.length - 1] + "')";
+    // La portada es la foto con prefijo 0-; si no hay, la más reciente.
+    let iPortada = archivos.findIndex(function (f) { return /^0[-_]/.test(f); });
+    if (iPortada < 0) iPortada = fotos.length - 1;
+    document.getElementById('heroFoto').style.backgroundImage = "url('" + fotos[iPortada] + "')";
     document.querySelector('.hero').classList.add('con-foto');
 
     const imgs = Array.prototype.slice.call(sec.querySelectorAll('img'));
@@ -932,8 +1033,7 @@
             if (!cfgArr) return;
             const cfg = {};
             cfgArr.forEach(function (r) { cfg[r.seccion] = r.datos || {}; });
-            const v = cfg.vestimenta || {};
-            if (v.tipo || v.colores_reservados) document.getElementById('cardVestimenta').hidden = false;
+            /* Este evento no lleva código de vestimenta: la tarjeta es fija. */
         })
         .catch(function () {});
 })();
