@@ -347,12 +347,16 @@
         }
         .boches .palabra {
             font-family: 'Racing Sans One', cursive;
-            font-size: clamp(2.4rem, 11vw, 4rem);
-            color: var(--rojo); line-height: 1; text-transform: uppercase;
-            display: block; margin: .6rem 0 .8rem;
+            font-size: clamp(1.5rem, 6.5vw, 2.4rem);
+            color: var(--rojo); line-height: 1.15; text-transform: uppercase;
+            display: block; margin: 1.6rem 0 0;
         }
-        .boches p { color: var(--gris); font-size: 1rem; }
-        .boches strong { color: var(--blanco); }
+        .boches p {
+            color: var(--gris); font-size: clamp(1rem, 3.4vw, 1.12rem);
+            line-height: 1.75;
+        }
+        .boches p + p { margin-top: .9rem; }
+        .boches strong { color: var(--blanco); font-weight: 600; }
 
         /* ── Acciones ───────────────────────────────────────── */
         .acciones { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 2.4rem; }
@@ -486,7 +490,7 @@
     <audio id="sndAcelerada" src="audio/motor-acelerada.mp3" preload="auto"></audio>
 
     <audio id="bgMusic" loop preload="metadata">
-        <source src="audio/cancion-alonso-f1.mp3" type="audio/mpeg">
+        <source src="audio/cancion-alonso-v3.mp3" type="audio/mpeg">
     </audio>
 
     <!-- ═════════ HERO ═════════ -->
@@ -508,7 +512,7 @@
     <nav class="nav-sticky">
         <a href="#cuenta">Salida en</a>
         <a href="#circuito">El circuito</a>
-        <a href="#boches">Boches</a>
+        <a href="#invitacion">La invitación</a>
         <a href="#escuderia">Escudería</a>
         <a href="#galeria" id="navGaleria" hidden>Sus vueltas</a>
         <a href="#rsvp">Confirmar</a>
@@ -585,14 +589,16 @@
 
     <div class="cuadros delgada"></div>
 
-    <!-- ═════════ BOCHES ═════════ -->
-    <section class="seccion oscura" id="boches">
+    <!-- ═════════ LA INVITACIÓN ═════════ -->
+    <section class="seccion oscura" id="invitacion">
         <div class="container reveal">
             <div class="boches">
-                <p>A Alonso le encantan los coches. Aunque él todavía les dice…</p>
-                <span class="palabra">¡Boches!</span>
-                <p>Así que ponte tu casco y vente a correr con nosotros.<br>
-                   <strong>Tres años, tres vueltas, una fiesta.</strong></p>
+                <p>Hace 3 años comenzó nuestra aventura más bonita…</p>
+                <p>Y hoy Alonso ya está listo para dar
+                   <strong>una nueva vuelta al circuito</strong>.</p>
+                <p>Así que prepara tu casco, porque queremos celebrar contigo
+                   sus <strong>3 años de vida, alegría y amor</strong>.</p>
+                <span class="palabra">¡Nos vemos en la pista! 🏁</span>
             </div>
         </div>
     </section>
