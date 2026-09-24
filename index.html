@@ -663,7 +663,7 @@
             style="position:fixed;bottom:20px;right:20px;z-index:9999;width:48px;height:48px;border-radius:50%;background:var(--rojo);border:none;color:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(225,6,0,.45);">&#9835;</button>
 
 <script>window.EVENTO_SLUG='3-anos-alonso';</script>
-<script src="js/photos.js"></script>
+<script src="js/photos.850d7552.js"></script>
 <script src="js/evento-loader.js"></script>
 <script src="visitas.js"></script>
 <script src="js/rsvp-guest.js"></script>
@@ -704,11 +704,31 @@
 const Motor = (function () {
     let ctx = null, osc1 = null, osc2 = null, filtro = null, vol = null, encendido = false;
 
+    /* iOS no despierta el audio hasta que se reproduce algo, aunque
+       sea un silencio de un frame. Este es el truco de siempre. */
+    function despertar() {
+        try {
+            const b = ctx.createBuffer(1, 1, 22050);
+            const f = ctx.createBufferSource();
+            f.buffer = b;
+            f.connect(ctx.destination);
+            f.start(0);
+        } catch (e) {}
+    }
+
+    function reanudar() {
+        if (ctx && ctx.state === 'suspended') {
+            const p = ctx.resume();
+            if (p && p.then) p.then(despertar).catch(function () {});
+            else despertar();
+        }
+    }
+
     function arrancar() {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return false;
-        if (!ctx) ctx = new AC();
-        if (ctx.state === 'suspended') ctx.resume();
+        if (!ctx) { ctx = new AC(); despertar(); }
+        reanudar();
         if (encendido) return true;
 
         osc1 = ctx.createOscillator();
@@ -722,7 +742,9 @@ const Motor = (function () {
         filtro.Q.value = 6;
 
         vol = ctx.createGain();
-        vol.gain.value = 0;
+        // Arrancar en cero deja el contexto dormido en iOS: se
+        // empieza con el ralentí ya sonando, bajito.
+        vol.gain.value = 0.03;
 
         osc1.connect(filtro); osc2.connect(filtro);
         filtro.connect(vol); vol.connect(ctx.destination);
@@ -763,7 +785,9 @@ const Motor = (function () {
         encendido = false;
     }
 
-    return { arrancar: arrancar, revolucionar: revolucionar, salir: salir, apagar: apagar };
+    return { arrancar: arrancar, revolucionar: revolucionar, salir: salir,
+             apagar: apagar, reanudar: reanudar,
+             activo: function () { return encendido && ctx && ctx.state === 'running'; } };
 })();
 
 /* ── Splash: las cinco luces de arranque ─────────────────────
@@ -798,8 +822,11 @@ const Motor = (function () {
         });
     }
 
-    // Cualquier toque en el splash arranca el motor y las luces
+    // Cualquier toque arranca el motor y las luces. En móvil no
+    // siempre llega pointerdown primero, así que se escucha también
+    // touchstart; el once evita que corra dos veces.
     splash.addEventListener('pointerdown', correrSecuencia, { once: true });
+    splash.addEventListener('touchstart', correrSecuencia, { once: true, passive: true });
     // Y si nadie toca, las luces se encienden solas (sin sonido)
     setTimeout(function () {
         if (!secuenciaCorrida && !sinMovimiento) {
@@ -811,6 +838,7 @@ const Motor = (function () {
 
     btn.addEventListener('click', function () {
         correrSecuencia();
+        Motor.reanudar();          // por si el primer gesto no bastó en móvil
         luces.forEach(function (l) { l.classList.remove('on'); });   // ¡se apagan: a correr!
         Motor.salir();                                                // acelerón de salida
         setTimeout(function () {
