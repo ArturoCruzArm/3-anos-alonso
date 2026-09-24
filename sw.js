@@ -8,7 +8,7 @@ const SHELL = [
     './',
     './index.html',
     './js/config.js',
-    './js/photos.850d7552.js',
+    './js/photos.851b832c.js',
     './js/evento-loader.js',
     './visitas.js',
     './favicon.svg'
