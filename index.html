@@ -471,7 +471,7 @@
     </div>
 
     <audio id="bgMusic" loop preload="metadata">
-        <source src="audio/cancion-alonso.mp3" type="audio/mpeg">
+        <source src="audio/cancion-alonso-f1.mp3" type="audio/mpeg">
     </audio>
 
     <!-- ═════════ HERO ═════════ -->
@@ -815,9 +815,13 @@ const Motor = (function () {
         Motor.salir();                                                // acelerón de salida
         setTimeout(function () {
             splash.classList.add('hidden');
-            if (window.__encenderMusica) window.__encenderMusica();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }, sinMovimiento ? 0 : 420);
+        // La canción entra cuando el acelerón ya va bajando, para que
+        // el motor le dé paso en vez de encimarse con ella.
+        setTimeout(function () {
+            if (window.__encenderMusica) window.__encenderMusica();
+        }, sinMovimiento ? 0 : 900);
     });
 })();
 
