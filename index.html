@@ -713,6 +713,7 @@
    archivo que descargar ni sonido ajeno de por medio. ── */
 const Motor = (function () {
     let ctx = null, osc1 = null, osc2 = null, filtro = null, vol = null, encendido = false;
+    let saliendo = false;   // una vez que se sale, nadie vuelve a tocar el volumen
 
     /* iOS no despierta el audio hasta que se reproduce algo, aunque
        sea un silencio de un frame. Este es el truco de siempre. */
@@ -763,12 +764,13 @@ const Motor = (function () {
         osc2.frequency.value = 46 * 1.012;   // desafine leve: da cuerpo
         osc1.start(); osc2.start();
         encendido = true;
+        saliendo = false;
         return true;
     }
 
     /* Sube de revoluciones: 0 = ralentí, 1 = a fondo */
     function revolucionar(nivel, segundos) {
-        if (!encendido) return;
+        if (!encendido || saliendo) return;   // el acelerón manda
         const t = ctx.currentTime, d = segundos || .35;
         const hz = 46 + nivel * 58;
         osc1.frequency.linearRampToValueAtTime(hz, t + d);
@@ -780,8 +782,21 @@ const Motor = (function () {
     /* Acelerón de salida: corto y con corte seco, para que se
        distinga del inicio de la canción en vez de mezclarse. */
     function salir() {
-        if (!encendido) return;
+        if (!encendido || saliendo) return;
+        saliendo = true;
         const t = ctx.currentTime;
+
+        // Borrar lo que las luces hubieran dejado programado: si no,
+        // sus rampas pisan el acelerón y el motor se queda mudo.
+        vol.gain.cancelScheduledValues(t);
+        osc1.frequency.cancelScheduledValues(t);
+        osc2.frequency.cancelScheduledValues(t);
+        filtro.frequency.cancelScheduledValues(t);
+        vol.gain.setValueAtTime(vol.gain.value, t);
+        osc1.frequency.setValueAtTime(osc1.frequency.value, t);
+        osc2.frequency.setValueAtTime(osc2.frequency.value, t);
+        filtro.frequency.setValueAtTime(filtro.frequency.value, t);
+
         osc1.frequency.linearRampToValueAtTime(260, t + .3);
         osc2.frequency.linearRampToValueAtTime(263, t + .3);
         filtro.frequency.linearRampToValueAtTime(3000, t + .3);
@@ -798,7 +813,13 @@ const Motor = (function () {
 
     return { arrancar: arrancar, revolucionar: revolucionar, salir: salir,
              apagar: apagar, reanudar: reanudar,
-             activo: function () { return encendido && ctx && ctx.state === 'running'; } };
+             activo: function () { return encendido && ctx && ctx.state === 'running'; },
+             estado: function () {
+                 return { contexto: ctx ? ctx.state : 'sin contexto',
+                          encendido: encendido, saliendo: saliendo,
+                          volumen: vol ? Number(vol.gain.value.toFixed(3)) : null,
+                          frecuencia: osc1 ? Math.round(osc1.frequency.value) : null };
+             } };
 })();
 
 /* ── Splash: las cinco luces de arranque ─────────────────────
@@ -816,9 +837,12 @@ const Motor = (function () {
        la pantalla, así que el motor arranca con el primer toque y
        las luces se encienden en ese momento. */
     let secuenciaCorrida = false;
+    let arrancadoEn = 0;
+    const temporizadores = [];
     function correrSecuencia() {
         if (secuenciaCorrida) return;
         secuenciaCorrida = true;
+        arrancadoEn = Date.now();
         const hayMotor = Motor.arrancar();
         if (sinMovimiento) {
             luces.forEach(function (l) { l.classList.add('on'); });
@@ -826,10 +850,10 @@ const Motor = (function () {
             return;
         }
         luces.forEach(function (l, i) {
-            setTimeout(function () {
+            temporizadores.push(setTimeout(function () {
                 l.classList.add('on');
                 if (hayMotor) Motor.revolucionar((i + 1) / luces.length, .3);
-            }, i * 420);
+            }, i * 420));
         });
     }
 
@@ -850,18 +874,61 @@ const Motor = (function () {
     btn.addEventListener('click', function () {
         correrSecuencia();
         Motor.reanudar();          // por si el primer gesto no bastó en móvil
-        luces.forEach(function (l) { l.classList.remove('on'); });   // ¡se apagan: a correr!
-        Motor.salir();                                                // acelerón de salida
+
+        // Las luces pendientes se cancelan: si no, siguen encendiéndose
+        // encima del acelerón y le pisan el volumen.
+        temporizadores.forEach(clearTimeout);
+        temporizadores.length = 0;
+
+        // En celular se toca el botón casi de inmediato. Si el motor
+        // apenas arrancó, se le dan unas décimas para que se oiga la
+        // subida antes del acelerón.
+        const transcurrido = Date.now() - arrancadoEn;
+        const espera = sinMovimiento ? 0 : Math.max(0, 450 - transcurrido);
+
         setTimeout(function () {
-            splash.classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, sinMovimiento ? 0 : 420);
-        // El motor se apaga a los 700 ms; la canción entra a los 1000,
-        // con un respiro de por medio para que se distingan.
-        setTimeout(function () {
-            if (window.__encenderMusica) window.__encenderMusica();
-        }, sinMovimiento ? 0 : 1000);
+            luces.forEach(function (l) { l.classList.remove('on'); });   // ¡se apagan: a correr!
+            Motor.salir();                                               // acelerón de salida
+
+            setTimeout(function () {
+                splash.classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, sinMovimiento ? 0 : 320);
+            // El motor se apaga a los 700 ms; la canción entra después,
+            // con un respiro de por medio para que se distingan.
+            setTimeout(function () {
+                if (window.__encenderMusica) window.__encenderMusica();
+            }, sinMovimiento ? 0 : 1000);
+        }, espera);
     });
+})();
+
+/* ── Diagnóstico: abrir con ?debug=1 ─────────────────────────
+   Muestra en pantalla el estado real del audio. Sirve para revisar
+   un celular que uno no tiene enfrente. ── */
+(function () {
+    if (new URLSearchParams(location.search).get('debug') !== '1') return;
+    const caja = document.createElement('div');
+    caja.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;background:rgba(0,0,0,.88);' +
+        'color:#0f0;font:11px/1.5 monospace;padding:10px 12px;border-radius:8px;max-width:92vw;' +
+        'border:1px solid #0f0;white-space:pre;pointer-events:none';
+    document.body.appendChild(caja);
+    const audio = document.getElementById('bgMusic');
+    setInterval(function () {
+        const m = (typeof Motor !== 'undefined' && Motor.estado) ? Motor.estado() : {};
+        caja.textContent =
+            'MOTOR\n' +
+            '  contexto   ' + (m.contexto || '—') + '\n' +
+            '  encendido  ' + m.encendido + '\n' +
+            '  saliendo   ' + m.saliendo + '\n' +
+            '  volumen    ' + m.volumen + '\n' +
+            '  frecuencia ' + m.frecuencia + ' Hz\n' +
+            'CANCION\n' +
+            '  red        ' + audio.networkState + '  listo ' + audio.readyState + '\n' +
+            '  pausada    ' + audio.paused + '\n' +
+            '  error      ' + (audio.error ? audio.error.code : 'no') + '\n' +
+            'FOTOS        ' + (window.PHOTOS || []).length;
+    }, 250);
 })();
 
 /* ── Cuenta regresiva ──────────────────────────────────────── */
